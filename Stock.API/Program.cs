@@ -17,8 +17,7 @@ builder.Logging.AddOpenTelemetry(cfg =>
     var serviceVersion = builder.Configuration.GetSection("OpenTelemetry")["ServiceVersion"];
 
     cfg.SetResourceBuilder(ResourceBuilder.CreateDefault().AddService(serviceName!, serviceVersion: serviceVersion));
-    cfg.AddOtlpExporter((x, y) => { });
-
+    cfg.AddConsoleExporter().AddOtlpExporter((x, y) => { });
 });
 // Add services to the container.
 
@@ -32,9 +31,7 @@ builder.Services.AddOpenTelemetryExt(builder.Configuration);
 
 builder.Services.AddHttpClient<PaymentService>(options =>
 {
-
     options.BaseAddress = new Uri((builder.Configuration.GetSection("ApiServices")["PaymentApi"])!);
-
 });
 
 
@@ -47,21 +44,14 @@ builder.Services.AddMassTransit(x =>
     {
         cfg.Host("localhost", "/", host =>
         {
-
             host.Username("guest");
             host.Password("guest");
         });
 
 
-        cfg.ReceiveEndpoint("stock.order-created-event.queue", e =>
-        {
-            e.ConfigureConsumer<OrderCreatedEventConsumer>(context);
-        });
-
-
+        cfg.ReceiveEndpoint("stock.order-created-event.queue",
+            e => { e.ConfigureConsumer<OrderCreatedEventConsumer>(context); });
     });
-
-
 });
 
 var app = builder.Build();
@@ -72,7 +62,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-app.UseMiddleware<OpenTelemetryTraceIdMiddleware>();
+
+//app.UseMiddleware<OpenTelemetryTraceIdMiddleware>();
 app.UseMiddleware<RequestAndResponseActivityMiddleware>();
 app.UseExceptionMiddleware();
 app.UseHttpsRedirection();

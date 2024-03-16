@@ -8,6 +8,7 @@ namespace Stock.API.Services
     {
         private readonly PaymentService _paymentService;
         private readonly ILogger<StockService> _logger;
+
         public StockService(PaymentService paymentService, ILogger<StockService> logger)
         {
             _paymentService = paymentService;
@@ -16,26 +17,20 @@ namespace Stock.API.Services
 
         private Dictionary<int, int> GetProductStockList()
         {
-
             Dictionary<int, int> productStockList = new();
             productStockList.Add(1, 10);
             productStockList.Add(2, 20);
             productStockList.Add(3, 30);
 
             return productStockList;
-
         }
 
 
-        public async Task<ResponseDto<StockCheckAndPaymentProcessResponseDto>> CheckAndPaymentProcess(StockCheckAndPaymentProcessRequestDto request)
+        public async Task<ResponseDto<StockCheckAndPaymentProcessResponseDto>> CheckAndPaymentProcess(
+            StockCheckAndPaymentProcessRequestDto request)
         {
-
-
-
-
             var userId = Activity.Current?.GetBaggageItem("userId");
 
-           
 
             var productStockList = GetProductStockList();
 
@@ -43,20 +38,20 @@ namespace Stock.API.Services
 
             foreach (var orderItem in request.OrderItems)
             {
-                var hasExistStock = productStockList.Any(x => x.Key == orderItem.ProductId && x.Value >= orderItem.Count);
+                var hasExistStock =
+                    productStockList.Any(x => x.Key == orderItem.ProductId && x.Value >= orderItem.Count);
 
                 stockStatus.Add((orderItem.ProductId, hasExistStock));
-
             }
 
             if (stockStatus.Any(x => x.hasStockExist == false))
             {
-
-                return ResponseDto<StockCheckAndPaymentProcessResponseDto>.Fail(HttpStatusCode.BadRequest.GetHashCode(), "stock yetersiz");
-
+                _logger.LogInformation("Stock yetersiz.orderCode:{@orderCode}", request.OrderCode);
+                return ResponseDto<StockCheckAndPaymentProcessResponseDto>.Fail(HttpStatusCode.BadRequest.GetHashCode(),
+                    "stock yetersiz");
             }
 
-          
+
             _logger.LogInformation("Stock ayrıldı.orderCode:{@orderCode}", request.OrderCode);
             var (isSuccess, failMessage) = await _paymentService.CreatePaymentProcess(new PaymentCreateRequestDto()
             {
@@ -66,17 +61,13 @@ namespace Stock.API.Services
 
             if (isSuccess)
             {
-                return ResponseDto<StockCheckAndPaymentProcessResponseDto>.Success(HttpStatusCode.OK.GetHashCode(), new() { Description = "ödeme süreci tamamlandı." });
+                return ResponseDto<StockCheckAndPaymentProcessResponseDto>.Success(HttpStatusCode.OK.GetHashCode(),
+                    new() { Description = "ödeme süreci tamamlandı." });
             }
 
 
-            return ResponseDto<StockCheckAndPaymentProcessResponseDto>.Fail(HttpStatusCode.BadRequest.GetHashCode(), failMessage!);
-
-
+            return ResponseDto<StockCheckAndPaymentProcessResponseDto>.Fail(HttpStatusCode.BadRequest.GetHashCode(),
+                failMessage!);
         }
-
-
-
-
     }
 }

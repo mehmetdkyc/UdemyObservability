@@ -24,11 +24,7 @@ builder.Logging.AddOpenTelemetry(cfg =>
 
     cfg.SetResourceBuilder(ResourceBuilder.CreateDefault().AddService(serviceName!, serviceVersion: serviceVersion));
     cfg.AddOtlpExporter((x, y) => { });
-
 });
-
-
-
 
 
 // Add services to the container.
@@ -45,20 +41,11 @@ builder.Services.AddSingleton<IConnectionMultiplexer>(sp =>
     var redisService = sp.GetService<RedisService>();
 
     return redisService!.GetConnectionMultiplexer;
-
 });
-builder.Services.AddSingleton(_ =>
-{
-    
-
-    return new RedisService(builder.Configuration);
-
-});
+builder.Services.AddSingleton(_ => { return new RedisService(builder.Configuration); });
 builder.Services.AddHttpClient<StockService>(options =>
 {
-
     options.BaseAddress = new Uri((builder.Configuration.GetSection("ApiServices")["StockApi"])!);
-
 });
 
 builder.Services.AddDbContext<AppDbContext>(options =>
@@ -72,31 +59,14 @@ builder.Services.AddMassTransit(x =>
     {
         cfg.Host("localhost", "/", host =>
         {
-
             host.Username("guest");
             host.Password("guest");
         });
-
-
     });
-
-
 });
 
 
-
 var app = builder.Build();
-
-
-
-
-
-
-
-
-
-
-
 
 
 // Configure the HTTP request pipeline.
@@ -107,7 +77,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-app.UseMiddleware<OpenTelemetryTraceIdMiddleware>();
+//app.UseMiddleware<OpenTelemetryTraceIdMiddleware>();
 app.UseMiddleware<RequestAndResponseActivityMiddleware>();
 app.UseExceptionMiddleware();
 app.UseAuthorization();

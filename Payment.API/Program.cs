@@ -15,7 +15,6 @@ builder.Logging.AddOpenTelemetry(cfg =>
 
     cfg.SetResourceBuilder(ResourceBuilder.CreateDefault().AddService(serviceName!, serviceVersion: serviceVersion));
     cfg.AddOtlpExporter((x, y) => { });
-
 });
 // Add services to the container.
 
@@ -33,7 +32,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-app.UseMiddleware<OpenTelemetryTraceIdMiddleware>();
+//app.UseMiddleware<OpenTelemetryTraceIdMiddleware>();
 
 app.UseMiddleware<RequestAndResponseActivityMiddleware>();
 app.UseExceptionMiddleware();

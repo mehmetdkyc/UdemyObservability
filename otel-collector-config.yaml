@@ -7,9 +7,9 @@ processors:
   batch:
 exporters:
   otlp:
-   endpoint : https://otlp.eu01.nr-data.net:4318
-   headers:
-     api-key: "eu01xx97f7322ad415d93b0c930a40e8910aNRAL"
+   endpoint : http://apm-server:8200
+   tls:
+      insecure: true
 
 
 extensions:
