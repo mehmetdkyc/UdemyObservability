@@ -2,7 +2,8 @@ version: '3.4'
 services:
   redis:
    ports:
-    - 6379:6379 
+    - 6379:6379
+   command: /bin/sh -c "redis-server --requirepass XXXX2024*?"  
   rabbitmq:
    ports:
     - 5672:5672 
