@@ -6,7 +6,14 @@ services:
   rabbitmq:
    ports:
     - 5672:5672 
-    - 15672:15672 
+    - 15672:15672
+   environment:
+    RABBITMQ_DEFAULT_USER: "rabbitmq"
+    RABBITMQ_DEFAULT_PASS: "XXXX2024*?" 
+   volumes:
+     - rabbitmqdata_etc:/etc/rabbitmq/
+     - rabbitmqdata_data:/var/lib/rabbitmq/
+     - rabbitmqdata_log:/var/log/rabbitmq/
   otel-collector:
    ports:
         - 1888:1888 # pprof extension
@@ -143,4 +150,10 @@ volumes:
   esdata01:
     driver: local
   kibanadata:
+    driver: local
+  rabbitmqdata_etc :
+    driver: local
+  rabbitmqdata_data :
+    driver: local
+  rabbitmqdata_log :
     driver: local
